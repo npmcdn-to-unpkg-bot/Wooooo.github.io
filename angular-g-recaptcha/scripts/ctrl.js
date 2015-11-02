@@ -22,6 +22,7 @@ define(function(require){
         
         $scope.reset = function(){
             $grecaptcha.reset(_widgetId);
+            $scope.response = undefined;
         };
         
         $scope.getResponse = function(){
