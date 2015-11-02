@@ -1,0 +1,44 @@
+<div class="jumbotron">
+    
+    <h1 class="display-3">Hello, recaptcha!</h1>
+    
+    <p class="lead">Angular module for google recaptcha</p>
+    
+    <hr class="m-y-md">
+    
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    Recaptcha box
+                </div>
+                
+                <div class="card-block g-recaptcha"> Loading.. </div>
+            
+                <div class="card-block">
+                    
+                    <div class="btn-group">
+                        <button class="btn btn-danger" data-ng-click="reset();"> Reset </button>
+                        <button class="btn btn-success" data-ng-click="getResponse();"> GetResponse </button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    Result
+                </div>
+                
+                <div data-ng-bind="response" style="word-wrap:break-word;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <br>
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+    </p>
+</div>

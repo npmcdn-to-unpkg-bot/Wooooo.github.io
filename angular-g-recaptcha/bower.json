@@ -1,0 +1,17 @@
+{
+  "name": "angular-g-recaptcha",
+  "homepage": "https://Wooooo.github.io",
+  "authors": [
+    "Taewoo Kim <xodn4195+c9@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular-g-recaptcha": "~2.0.1"
+  }
+}
