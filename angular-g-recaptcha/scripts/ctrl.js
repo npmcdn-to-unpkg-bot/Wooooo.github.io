@@ -14,10 +14,15 @@ define(function(require){
             $scope.response = response; 
         };
         
+        var expiredCallback = function(){
+            $scope.response = undefined;
+        }
+        
+        
         $grecaptcha.init().then(function(){
             target.empty();
             
-            $grecaptcha.render(target[0], {callback: callback}).then(function(widgetId){
+            $grecaptcha.render(target[0], {callback: callback, 'expired-callback': expiredCallback}).then(function(widgetId){
                 _widgetId = widgetId;
             })
         })
