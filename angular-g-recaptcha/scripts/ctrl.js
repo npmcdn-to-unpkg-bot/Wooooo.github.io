@@ -1,6 +1,8 @@
 define(function(require){
     'use strict';
     
+    var angular = require('angular');
+    
     var ctrl = angular.module('ctrl', [])
     .controller('homeCtrl', function($grecaptcha, $document, $scope){
         var target = angular.element($document[0].querySelector('.g-recaptcha'));

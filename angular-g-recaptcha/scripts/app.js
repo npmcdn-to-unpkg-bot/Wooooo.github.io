@@ -4,6 +4,7 @@ define(function(require){
     require('ui-router');
     require('angular-g-recaptcha');
     
+    var angular = require('angular');
     
     var app = angular.module('gre', [
             //angular official libraries
