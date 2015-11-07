@@ -4,7 +4,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     ngdocs: {
         options: {
-            dest: 'docs',
+            dest: '/angular-g-recaptcha/docs',
             scripts: [
                 './bower_components/angular-g-recaptcha/angular-g-recaptcha.js',
                 './bower_components/angular/angular.js',
