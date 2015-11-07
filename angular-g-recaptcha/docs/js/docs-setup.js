@@ -1,6 +1,6 @@
 NG_DOCS={
   "sections": {
-    "api": "API Documentation"
+    "api": "API Reference"
   },
   "pages": [
     {
@@ -37,7 +37,7 @@ NG_DOCS={
       "type": "directive",
       "moduleName": "wo.grecaptcha",
       "shortDescription": "Set view value of model when recaptcha validating is done.",
-      "keywords": "$document $grecaptcha $grecaptchaprovider $on $parse $scope angular api assignable box config console controller dark data-bind data-ng-controller data-ng-model directive expired expression function gre gre-info grecaptcha grectrl gredemo greinfo greinfofind html js load loading log model module ng ng-model object recaptcha rendered reset response script set sitekey test validating var view widgetid wo"
+      "keywords": "$document $grecaptcha $grecaptchaprovider $on $parse $scope angular api assignable box break-word config console controller dark data-bind data-ng-controller data-ng-model directive expired expression function gre gre-info grecaptcha grectrl gredemo greinfo greinfofind html js load loading log model module ng ng-model object recaptcha rendered reset response script set sitekey style test validating var view widgetid wo word-wrap"
     },
     {
       "section": "api",
@@ -65,8 +65,9 @@ NG_DOCS={
   "editExample": true,
   "startPage": "/api",
   "scripts": [
+    "angular.min.js",
+    "angular-animate.min.js",
     "angular-g-recaptcha.js",
-    "angular.js",
-    "angular-animate.js"
+    "ssl.js"
   ]
 };

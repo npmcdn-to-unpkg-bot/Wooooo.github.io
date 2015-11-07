@@ -4,24 +4,27 @@ module.exports = function(grunt) {
   grunt.initConfig({
     ngdocs: {
         options: {
-            dest: '/angular-g-recaptcha/docs',
+            dest: 'docs',
             scripts: [
+                '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js',
+                '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate.min.js',
                 './bower_components/angular-g-recaptcha/angular-g-recaptcha.js',
-                './bower_components/angular/angular.js',
-                './bower_components/angular-animate/angular-animate.js'
+                './scripts/ssl.js'
             ],
             html5Mode: false,
             startPage: '/api',
-            titleLink: "/api",
+            titleLink: "https://wooooo.github.io/angular-g-recaptcha",
             bestMatch: true,
             analytics: {
                   account: 'UA-69569159-2'
-            }
+            },
+            title: 'Gre',
+            navTemplate: 'templates/nav.html'
         },
     
         api: {
             src: ['./bower_components/angular-g-recaptcha/angular-g-recaptcha.js'],
-            title: 'API Documentation'
+            title: 'API Reference'
         }
             // discussions: {
             //       shortName: 'my',
@@ -32,10 +35,7 @@ module.exports = function(grunt) {
             // tutorial: {
             // src: ['content/tutorial/*.ngdoc'],
             // title: 'Tutorial'
-            // },
-            // api: {
-            // src: ['src/**/*.js', '!src/**/*.spec.js'],
-            // title: 'API Documentation'
+            // }
     }
     
   });

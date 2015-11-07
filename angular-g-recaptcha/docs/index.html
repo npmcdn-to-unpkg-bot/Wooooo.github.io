@@ -11,7 +11,7 @@
                  Declarative templates with data-binding, MVC, dependency injection and great
                  testability story all implemented with pure client-side JavaScript!">
   <meta name="fragment" content="!">
-  <title ng-bind-template="angular-g-recaptcha-page: {{partialTitle}}">Docs</title>
+  <title ng-bind-template="Gre: {{partialTitle}}">Docs</title>
   <script type="text/javascript">
     // dynamically add base tag as well as css and javascript files.
     // we can't add css/js the usual way, because some browsers (FF) eagerly prefetch resources
@@ -43,11 +43,13 @@
       addTag('script', {src: 'js/marked.js'}, sync);
 
       
+        addTag('script', {src: '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js'}, sync);
+      
+        addTag('script', {src: '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate.min.js'}, sync);
+      
         addTag('script', {src: 'grunt-scripts/angular-g-recaptcha.js'}, sync);
       
-        addTag('script', {src: 'grunt-scripts/angular.js'}, sync);
-      
-        addTag('script', {src: 'grunt-scripts/angular-animate.js'}, sync);
+        addTag('script', {src: 'grunt-scripts/ssl.js'}, sync);
       
       
       addTag('script', {src: 'js/angular-bootstrap.js'}, sync);
@@ -98,14 +100,16 @@
         <div class="container">
           
           
-            <a  href="/api"  class="brand">angular-g-recaptcha-page</a>
+            <a  href="https://wooooo.github.io/angular-g-recaptcha"  class="brand">Gre</a>
           
           <ul class="nav">
             <li ng-repeat="(url, name) in sections" ng-class="{active: isActivePath(url)}">
               <a ng-href="{{url}}"><i class="icon-book icon-white"></i> {{name}}</a>
             </li>
           </ul>
-          
+          <ul class="nav pull-right">
+	<li><a href="https://github.com/Wooooo/angular-g-recaptcha"><i class="icon-github icon-white"></i> Github</a></li>
+</ul>
         </div>
       </div>
     </div>
