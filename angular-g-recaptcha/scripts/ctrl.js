@@ -7,11 +7,12 @@ define(function(require){
     .controller('homeCtrl', function($grecaptcha, $document, $scope){
         $scope.greInfo = {};
         
-        $scope.$on('greInfo', function(greInfo) {
+        $scope.$watch('greInfo', function(greInfo) {
             if(!!greInfo) {
                 greInfo.promise.then(function(gre){
                     $scope.reset = function() {
                         gre.reset();
+                        $scope.response = undefined;
                     }
                     
                     $scope.getResponse = function() {

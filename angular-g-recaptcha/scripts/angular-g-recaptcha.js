@@ -1,6 +1,6 @@
 /**
  * @name angular-g-recaptcha
- * @version v2.0.1
+ * @version v3.0.0
  * @author Taewoo Kim xodn4195@gmail.com
  * @license MIT
  */
@@ -147,19 +147,22 @@ function minErr(module, ErrorConstructor) { // from angularjs source code
 var $greMinErr = minErr('$grecaptcha');
 
 /**
- * @namespace
- * @ngdoc provider
- * @name $grecaptchaProvider
+ * @ngdoc object
+ * 
+ * @name wo.grecaptcha.$grecaptchaProvider
+ * @requires wo.grecaptcha.$greLanguageCodes
+ * 
+ * 
  * @description 
- * grecaptcha provider 
+ * Grecaptcha provider which allow set recaptcha configs, languageCode, onLoadMethodName
  * 
  **/
-function $grecaptchaProvider(greLanguageCodes) {
+function $grecaptchaProvider($greLanguageCodes) {
     
     var _grecaptcha                 // grecaptcha Object
     ,   _languageCode               // languageCode value
     ,   _scriptTag                  // tag that contains recaptcha script
-    ,   _scriptLoadTimeout = 3000   // miliseconds of load time out
+    ,   _scriptLoadTimeout = 5000   // miliseconds of load time out
     ,   self = this                 // this reference
     ,   init_promise = undefined    // a promise of init method                 
                 
@@ -173,11 +176,16 @@ function $grecaptchaProvider(greLanguageCodes) {
     ,   type                : 'image'
     ,   size                : 'normal'
     ,   tabindex            : 0
-    ,   callback            : undefined
-    ,   'expired-callback'  : undefined
+    ,   callback            : angular.noop
+    ,   'expired-callback'  : angular.noop
     };
     
-     
+    var config_properties = ['sitekey', 'theme', 'type', 'size', 
+                'tabindex', 'callback', 'expired-callback'];
+    
+    var provider_properties = ['languageCode', 'grecaptcha', 'onLoadMethodName'].concat(config_properties);
+    
+    
     /**
      * @private
      * @description
@@ -196,7 +204,7 @@ function $grecaptchaProvider(greLanguageCodes) {
      * @param {string=} key property name
      * @param {*=} value property value
      * @param {Object} target the target which be set key and value
-     * @returns {this}
+     * @returns {Object} self
      */
     function setValue(key, value, target) {
         if( target === void 0 ) {
@@ -205,8 +213,6 @@ function $grecaptchaProvider(greLanguageCodes) {
         else {
             target[key] = value;
         }
-        
-        return self;
     }
     
     
@@ -214,13 +220,20 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setSitekey
-     * @description 
-     * Set sitekey of recaptcha box with 'sitekey'.
-     * Can't validate to identify the sitekey.
+     * @name wo.grecaptcha.$grecaptchaProvider#setSitekey
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {string} sitekey new sitekey
+     * @description 
+     * Set a sitekey of default config with 'sitekey'.<br>
+     * Can't validate 'sitekey'.
+     * 
+     * @example
+     * <pre>
+     * // test sitekey provided in official google recaptcha site
+     * $grecaptchaProvider.setSitekey('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'); 
+     * 
+     * </pre>
+     * @param {string} sitekey New default sitekey
      * @return {Object} self
      */
     this.setSitekey = function(sitekey){
@@ -228,6 +241,7 @@ function $grecaptchaProvider(greLanguageCodes) {
         
         //set phase
         setValue('sitekey', sitekey, arguments[1]);
+        
         return self;
     };
     
@@ -236,13 +250,30 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setTheme
-     * @description 
-     * Set theme of recaptcha box with given argument
-     * and validate whether provided theme is in candidates.
+     * @name wo.grecaptcha.$grecaptchaProvider#setTheme
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {string} theme new theme
+     * @description 
+     * Set a theme of default config with 'theme'.<br>
+     * Validate whether 'theme' is in correct options.
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setTheme('dark'); // dark theme
+     * 
+     * $grecaptchaProvider.setTheme('light'); // light theme
+     * 
+     * $grecaptchaProvider.setTheme('dARk'); // dark theme
+     * </pre>
+     * 
+     * @param {string} theme New default theme, allow any uppercase character
+     * 
+     * valid options: 
+     * <ul>
+     *  <li>'light'(default) : white </li>
+     *  <li>'dark' : black </li>
+     * </ul>
+     * 
      * @returns {Object} self
      */
     this.setTheme = function(theme){
@@ -259,6 +290,7 @@ function $grecaptchaProvider(greLanguageCodes) {
         
         //set phase
         setValue('theme', theme, arguments[1]);
+        
         return self;
     };
     
@@ -267,13 +299,31 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setType
-     * @description
-     * Set type of recaptcha box with given arugment
-     * and validate whether provided type is in candidates or not.
+     * @name wo.grecaptcha.$grecaptchaProvider#setType
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {string} type new type
+     * @description
+     * Set a type of default config with 'type'.<br>
+     * Validate whether 'type' is in correct optionss or not.
+     * 
+     * 
+     * @param {string} type New default type, allow any uppercase characater
+     * 
+     * valid options: 
+     * <ul>
+     *  <li> 'image'(default) : choose images corresponding to given topic </li>
+     *  <li> 'audio' : write numbers which be spoken in recaptcha box </li>
+     * </ul>
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setType('audio'); //audio type
+     * 
+     * $grecaptchaProvider.setType('IMAGE'); //image type
+     * 
+     * $grecaptchaProvider.setType('touch'); //will throw an error
+     * </pre>
+     * 
      * @returns {Object} self
      */
     this.setType = function(type) {
@@ -290,6 +340,7 @@ function $grecaptchaProvider(greLanguageCodes) {
         
         //set phase
         setValue('type', type, arguments[1]);
+        
         return self;
     };
     
@@ -298,13 +349,28 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setSize
-     * @description
-     * Set size of recaptcha box with given arugment
-     * and validate whether given size is in ['compact', 'normal'] or not.
+     * @name wo.grecaptcha.$grecaptchaProvider#setSize
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {string} size new size
+     * @description
+     * Set a size of default config with 'size'.<br>
+     * Validate whether 'size' is in correct candidates or not.<br>
+     * 
+     * @param {string} size New default size, allow any uppercase character
+     * 
+     * valid options: 
+     * <ul>
+     *  <li> 'normal'(default) : normal size, 300px </li>
+     *  <li> 'compcat' : small size  </li>
+     * </ul>
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setSize('compact');
+     * 
+     * $grecaptchaProvider.setSize('big'); //will throw an error
+     * </pre>
+     * 
      * @returns {Object} self
      */
     this.setSize = function(size) {
@@ -321,6 +387,7 @@ function $grecaptchaProvider(greLanguageCodes) {
         
         //set phase
         setValue('size', size, arguments[1]);
+        
         return self;
     }
     
@@ -329,13 +396,22 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setTabindex
-     * @description
-     * Set tabindex of recaptcha box with given argument
-     * and validate whether provided tabindex is number or not.
+     * @name wo.grecaptcha.$grecaptchaProvider#setTabindex
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {number} tabindex new tabindex
+     * @description
+     * Set a default tabindex of recaptcha box with 'tabindex'.<br>
+     * Validate whether 'tabindex' is number or not.
+     * 
+     * @param {number} tabindex New default tabindex
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setTabindex(10);
+     * 
+     * $grecaptchaProvider.setTabindex('100'); //will throw an error
+     * </pre>
+     * 
      * @returns {Object} self
      */
     this.setTabindex = function(tabindex) {
@@ -346,6 +422,7 @@ function $grecaptchaProvider(greLanguageCodes) {
         
         //set phase
         setValue('tabindex', tabindex, arguments[1]);
+        
         return self;
     }
     
@@ -354,23 +431,39 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setCallback
-     * @description
-     * Set callback which will be called after recaptcha confirm
-     * and validate if given callback is function.
+     * @name wo.grecaptcha.$grecaptchaProvider#setCallback
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {Function} callback new callback
+     * @description
+     * Set a default callback which will be called after recaptcha confirm. <br>
+     * Validate if 'callback' is function.
+     * 
+     * The callback function will accept response argument 
+     * which be returned by recaptcha box when validating be finished.
+     * 
+     * @example 
+     * <pre>
+     * // will log recaptcha response on console when validating be done
+     * $grecaptchaProvider.setCallback(function(res) {
+     *   console.log(res);
+     * });
+     * </pre>
+     * 
+     * @param {Function} callback New default callback
+     * 
      * @returns {Object} self
      */
     this.setCallback = function(callback) {
         //validate phase
-        if( !angular.isFunction(callback) ) {
-            throw new $greMinErr('badcallback', 'A callback has to be a function.');
+        //TODO allow callback arrays to be executed
+        if( !angular.isFunction(callback) && !angular.isArray(callback)) {
+            throw new $greMinErr('badcb', 
+                'A callback has to be a function or a array of functions.');
         }
         
         //set phase
         setValue('callback', callback, arguments[1]);
+        
         return self;
     }
     
@@ -379,23 +472,36 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setExpiredCallback
-     * @description
-     * Set expired-callback which will be called when recaptcha be expired
-     * and validate if 'expired-callback' is function.
+     * @name wo.grecaptcha.$grecaptchaProvider#setExpiredCallback
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {Function} expiredCallback new expired-callback
+     * @description
+     * Set expired-callback which will be called when recaptcha be expired. <br>
+     * Validate if 'expired-callback' is function.
+     * 
+     * @param {Function} expiredCallback New default expired-callback
+     * 
+     * @example
+     * <pre>
+     * //will log 'Expired!!!!' on console when expired.
+     * $grecaptchaProvider.setExpiredCallback(function(){
+     *   console.log('Expired!!!!');
+     * });
+     * </pre>
+     * 
      * @returns {Object} self
      */
     this.setExpiredCallback = function(expiredCallback) {
         //validate phase
-        if( !angular.isFunction(expiredCallback) ) {
-            throw new $greMinErr('badexpcallback', 'A expired-callback has to a function.');
+        //TODO allow callback arryas to be executed
+        if( !angular.isFunction(expiredCallback) && !angular.isArray(expiredCallback) ) {
+            throw new $greMinErr('badexpcb', 
+                'A expired-callback has to a function or a array of functions.');
         }
         
         //set phase
         setValue('expired-callback', expiredCallback, arguments[1]);
+        
         return self;
     }
     
@@ -403,23 +509,90 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setLanguageCode
+     * @name wo.grecaptcha.$grecaptchaProvider#setLanguageCode
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
+     * 
      * @description
-     * Set languageCode of recaptcha box with given argument
-     * and validate whether provided languageCode is in greLanguageCodes or not.
+     * Set a languageCode of default config with 'languageCode'. <br>
+     * Validate whether 'languageCode' is in {@link wo.grecaptcha.$greLanguageCodes $greLanguageCodes} or not.
      * 
      * @param {string} languageCode new languageCode
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setLanguageCode('ko');
+     * 
+     * $grecaptchaProvider.setLanguageCode('en');
+     * 
+     * $grecaptchaProvider.setLanguageCode('kr'); //will throw an error
+     * 
+     * $grecaptchaProvider.setLanguageCode('jp'); //will throw an error
+     * </pre>
      * @returns {Object} self
      */
     this.setLanguageCode = function(languageCode){
-        if( greLanguageCodes[languageCode] === void 0 ) {
+        if( $greLanguageCodes[languageCode] === void 0 ) {
             throw new $greMinErr('badlan', "The languageCode is invalid.", languageCode);
         }
         
         _languageCode = languageCode;
+        
         return self;
-    }
+    };
+    
+    
+    /**
+     * @ngdoc function
+     * 
+     * @name wo.grecaptcha.$grecaptchaProvider#setGrecaptcha
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
+     * 
+     * @description
+     * Set grecaptcha object with 'grecaptcha'
+     * 
+     * It may be dangerous to insert a custom grecaptcha object.
+     * 
+     * @param {Object} grecaptcha An object to insert into private grecaptcha object
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.setGrecaptcha(myGrecaptcha);
+     * </pre>
+     * 
+     * @returns {Object} self
+     */
+    this.setGrecaptcha = function(grecaptcha) {
+        _grecaptcha = grecaptcha;
+        
+        return self;
+    };
+    
+    
+    /**
+     * @ngdoc function
+     * 
+     * @name wo.grecaptcha.$grecaptchaProvider#setOnLoadMethodName
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
+     * 
+     * @description
+     * Set onLoadMethodName used as recaptcha script loaded method name
+     * 
+     * @param {string} onLoadMethodName New methodname
+     * 
+     * @example
+     * <pre>
+     * // The name of onload method becomes 'myCustomMethodName'
+     * $grecaptchaProvider.setOnLoadMethodName('myCustomMethodName'); 
+     * </pre>
+     * 
+     * @returns {Object} self
+     */
+    this.setOnLoadMethodName = function(onLoadMethodName){
+        _onLoadMethodName = onLoadMethodName;
+        
+        return self;
+    };
+    
     
     
     /**
@@ -442,45 +615,196 @@ function $grecaptchaProvider(greLanguageCodes) {
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setParameters
-     * @description
-     * Set parameters of recaptcha box with given arguments
-     * by using above set/validating functions.
+     * @name wo.grecaptcha.$grecaptchaProvider#set
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {Object} params new params
+     * @description
+     * Set default parameters of recaptcha box with given arguments
+     * by using above setting/validating functions.<br>
+     * If first argument is object, this method will be executed.
+     * 
+     * @param {Object} params new default params
+     * @param {boolean=} includeOthers
+     * if the 'params' include other property and 'includeOthers' is true, it will not throw an error<br>
+     * However, it includes other property but 'includeOthers' is false or undefined, then it will throw an error
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.set({
+     *      theme: 'dark',
+     *      type: 'audio',
+     *      size: 'compact',
+     *      languageCode: 'ko',
+     *      sitekey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+     *      onLoadMethodName: 'myCustomLoadName',
+     *      callback: function(res) {
+     *          console.log(res);
+     *      },
+     *      'expired-callback': function() {
+     *          console.log('It\'s expired!');
+     *      }
+     * });
+     * 
+     * // This will not throw an error though has 'otherProperty', 
+     * // because includeOthers is true.
+     * $grecaptchaProvider.set({
+     *      theme: 'dark',
+     *      type: 'audio',
+     *      size: 'compact',
+     *      languageCode: 'ko',
+     *      sitekey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+     *      onLoadMethodName: 'myCustomLoadName',
+     *      callback: function(res) {
+     *          console.log(res);
+     *      },
+     *      'expired-callback': function() {
+     *          console.log('It\'s expired!');
+     *      },
+     *      'otherProperty': 'otherValue'
+     * }, true);
+     * 
+     * 
+     * </pre>
+     * 
      * @returns {Object} self
      */
-    this.setParameters = function(params){
-        var arg = arguments;
+     
+     /**
+     * @ngdoc function
+     * 
+     * @name wo.grecaptcha.$grecaptchaProvider#set
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
+     * 
+     * @description
+     * Set a value of 'key' property. It will throw an error if 'key' doesn't exist in config properties.<br>
+     * If first argument is string, this method will be executed.
+     * 
+     * @param {string} key A key of grecaptcha default config
+     * <ul>
+     *  <li> theme : the theme of a recaptcha box</li>
+     *  <li> type : the type of a recaptcha box</li>
+     *  <li> size : the size of a recaptcha box</li>
+     *  <li> sitekey: the sitekey which validates a recaptcha box </li>
+     *  <li> tabindex: the tabindex of a recaptcha box </li>
+     *  <li> callback: the callback executed when recaptcha validating be completed </li>
+     *  <li> 'expired-callback': the callback executed when a recaptcha box is expired </li>
+     *  <li> onLoadMethodName: the global method name for method which be performed on recaptcha script loaded </li>
+     *  <li> grecaptcha: can set grecaptcha directly, but don't recommend </li>
+     *  <li> languageCode: the languageCode of recaptcha box </li>
+     * </ul>
+     * <br>
+     * More detail descriptions are below.
+     * @param {*} value a value of the key
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.set('theme', 'light');
+     * 
+     * $grecaptchaProvider.set('callback', function(res) {
+     *      console.log(res);
+     * });
+     * 
+     * $grecaptchaProvider.set('key', 'value'); // will throw an error
+     * </pre>
+     * @returns {Object} self
+     */
+    this.set = function(){
+        var args = arguments, that = this;
         
-        angular.forEach(params, function(value, key) {
-            key = camelCase('set-'+key);
-            if( !!self[key] ) {
-                self[key](value, arg[1]);
+        if( angular.isObject(args[0]) ) {
+            var params = args[0], includeOthers = args[1];
+            
+            angular.forEach(params, function(value, key) {
+                
+                if( includeOthers ) { // if includeOthers true, do nothing
+                    
+                    try{
+                        that.set(key, value);
+                    }catch(e) {}
+                }
+                else { // else throws an error if key doesn't exist
+                    that.set(key, value);
+                }
+            });
+        }
+        
+        else if( angular.isString(args[0]) ) {
+            var key = args[0], value = args[1];
+            
+            if( provider_properties.indexOf(key) !== -1 ) {
+                var methodName = camelCase('set-'+key);
+                
+                that[methodName](value);
             }
-        });
+            else {
+                throw new $greMinErr('setnosuchkey', 
+                    'There is no such key {0} in {1}.', key, provider_properties);
+            }
+        }
+        
         return self;
     }
-    
+
     
     
     /**
      * @ngdoc function
      * 
-     * @method
-     * @name $grecaptchaProvider#setOnLoadMethodName
-     * @description
-     * Set onLoadMethodName which be used as callback name when script loaded
+     * @name wo.grecaptcha.$grecaptchaProvider#get
+     * @methodOf wo.grecaptcha.$grecaptchaProvider
      * 
-     * @param {string} onLoadMethodName new methodname
-     * @returns {Object} self
+     * @description
+     * Get a value of default config's 'key' property.
+     * 
+     * @param {string} key A key to get value
+     * <ul>
+     *  <li> theme : the theme of a recaptcha box</li>
+     *  <li> type : the type of a recaptcha box</li>
+     *  <li> size : the size of a recaptcha box</li>
+     *  <li> sitekey: the sitekey which validates a recaptcha box </li>
+     *  <li> tabindex: the tabindex of a recaptcha box </li>
+     *  <li> callback: the callback executed when recaptcha validating be completed </li>
+     *  <li> 'expired-callback': the callback executed when a recaptcha box is expired </li>
+     *  <li> onLoadMethodName: the global method name for method which be performed on recaptcha script loaded </li>
+     *  <li> grecaptcha: can set grecaptcha directly, but don't recommend </li>
+     *  <li> languageCode: the languageCode of recaptcha box </li>
+     * </ul>
+     * 
+     * @example
+     * <pre>
+     * $grecaptchaProvider.get('theme'); // 'light'
+     * 
+     * $grecaptchaProvider.get('type'); // 'image'
+     * 
+     * $grecaptchaProvider.get('sitekey'); // undefined
+     * $grecaptchaProvider
+     * .set('sitekey', '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI')
+     * .get('sitekey'); // '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+     * </pre>
+     * 
+     * @returns {*} A value of 'key' property
      */
-    this.setOnLoadMethodName = function(onLoadMethodName){
-        _onLoadMethodName = onLoadMethodName;
-        return self;
+    this.get = function(key) {
+        if( key == 'languageCode' ) {
+            return _languageCode;
+        }
+        
+        else if( key == 'onLoadMethodName' ) {
+            return _onLoadMethodName;
+        }
+        
+        else if( key == 'grecaptcha' ) {
+            return _grecaptcha;
+        }
+        else if( config_properties.indexOf(key) !== -1 ) {
+            return _parameters[key];
+        }
+        
+        else {
+            throw new $greMinErr('getnosuchkey', 
+                'There is no such key {0} in {1}.', key, provider_properties);
+        }
     }
-    
     
     
     /**
@@ -491,7 +815,8 @@ function $grecaptchaProvider(greLanguageCodes) {
      * so that init grecaptcha Object
      */
     function createScript($document){
-        var src = "//www.google.com/recaptcha/api.js?render=explicit&onload="+_onLoadMethodName
+        var src = "//www.google.com/recaptcha/api.js?render=explicit&"
+                +"onload="+_onLoadMethodName
                 +(_languageCode ? "&hl="+_languageCode : "");
             
         var option = {
@@ -501,221 +826,944 @@ function $grecaptchaProvider(greLanguageCodes) {
         ,   src     : src
         };
         
-        var scriptTag = angular.extend($document[0].createElement('script'), option);
+        _scriptTag = angular.extend($document[0].createElement('script'), option);
         
-        $document[0].querySelector('head').appendChild(scriptTag);
+        $document[0].querySelector('head').appendChild(_scriptTag);
         
-        return scriptTag;
+        return _scriptTag;
     }
     
     
     
     this.$get = ["$q", "$window", "$rootScope", "$document", "$timeout", function($q, $window, $rootScope, $document, $timeout){
+        var greList = {};
+        var map = {};
         
         
         /**
-         * @namespace $grecaptcha
+         * @private
          * @description
-         * grecaptcha service
-         * 
+         * Get reference from private map object to maintain encapsulization.
+         * If not exists, generate it and insert.
          */
-        function $grecaptcha(){
-            var _self = this;
-            
-            
-            /**
-             * @ngdoc function
-             * 
-             * @method
-             * @name $grecaptcha#init
-             * @description
-             * Set _grecaptcha object from $window after recaptcha script loaded if undefined.
-             * <br><br>
-             * By returning a promise which be resolved on script loaded,<br> 
-             * can check whether _grecaptcha initialization is over or not.
-             * 
-             * @param {Function=} callback a callback performed after initialization is finished
-             * @returns {Promise} Promise that will be resolved when onload callback be execute
-             */
-            this.init = function(callback){
-                if( !!init_promise ) {
-                    return init_promise;
-                }
-                
-                return init_promise = $q(function(resolve, reject) {
-                    // TODO add timeout function to reject if script loading time is over..
-                    
-                    $window[_onLoadMethodName] = function(){
-                        $rootScope.$apply(function(){
-                            (callback || angular.noop)();
-                            _self.setGrecaptcha($window.grecaptcha);
-                            resolve();
-                        });
-                    };
-                    
-                    createScript($document);
-                });
-            };
-            
-            
-            
-            /**
-             * @ngdoc function
-             * 
-             * @method
-             * @name $grecaptcha#render
-             * @description
-             * Render a recaptcha box at 'element'.
-             * 
-             * @throws If 'element' is not a element or there's no sitekey
-             * 
-             * @param {(DOMElement|string)} element the element string or Object
-             * @param {Object=} param a param to be applied temporarily
-             * @param {Function=} onInit a callback to be executed when init method is being done
-             * @returns {Promise} Promise that will be resolved when _grecaptcha.render is reached.
-             * <br> The value promise reolve is the widget id of renedered recaptcha box.
-             */
-            this.render = function(el, param, onInit){
-                if( !angular.isElement(el) ) {
-                    throw new $greMinErr('badel', 'The element is invalid.');
-                }
-                if( !_parameters.sitekey ) {
-                    throw new $greMinErr('nositekey', 'The sitekey has to be provided.');
-                }
-                
-                param = param || {};
-                
-                return _self.init(onInit).then(function(){
-                    
-                    // TODO I don't like this logic
-                    // want to change it more gracefully and cleanly
-                    var paramCopy = angular.copy(_parameters);
-                    
-                    _self.setParameters(param, paramCopy);
-                    
-                    paramCopy['callback'] = function(response){
-                        $rootScope.$apply(function(){
-                            (param.callback || angular.noop)(response);
-                        });
-                    }
-                    
-                    paramCopy['expired-callback'] = function(){
-                        $rootScope.$apply(function(){
-                            (param['expired-callback'] || angular.noop)();
-                        })
-                    }
-                    
-                    return _grecaptcha.render(el, paramCopy);
-                });
-            };
-            
-            // TODO will add more codes into reset function someday..
-            this.reset = function(widget_id){
-                _grecaptcha.reset(widget_id);
-                
-                return _self;
-            };
-            
-            // TODO will add more codes into function someday also..
-            this.getResponse = function(widget_id){
-                
-                return _grecaptcha.getResponse(widget_id);
-            };
-            
-            
-            /** 
-             * @ngdoc function
-             * @name $grecaptcha#getGrecaptcha
-             * @description
-             * Getter for private _grecaptcha Object.
-             * 
-             * @returns private _grecaptcha Object
-             */
-            this.getGrecaptcha = function(){
-                return _grecaptcha;
-            };
-            
-            
-            /**
-             * @ngdoc function
-             * @name $grecaptcha#setGrecaptcha
-             * @description
-             * Setter for private _grecaptcha Object.
-             * 
-             * Allow set custom grecaptcha Object so that give more flexiblity
-             * 
-             * @param grecaptcha new grecaptcha Object
-             * @returns this service reference
-             */
-            this.setGrecaptcha = function(grecaptcha){
-                _grecaptcha = grecaptcha;
-                return _self;
-            };
-            
-            var properties = ['onLoadMethodName', 'sitekey', 'theme', 'type', 'size', 
-                'tabindex', 'callback', 'expired-callback', 'languageCode'];
-            
-            // setter loop
-            angular.forEach(properties, function(prop, index){
-                var methodName = camelCase('set-'+prop);
-                _self[methodName] = function(param) {
-                    self[methodName](param, arguments[1]);
-                    return _self;
-                };
-            });
-            
-            
-            /**
-             * @ngdoc function
-             * @name $grecaptcha#setParameters
-             * @description
-             * Check setter of _self and call it if exists
-             * 
-             * @param params the new parameters
-             * @returns this service reference
-             */
-            this.setParameters = function(params){
-                var arg = arguments;
-                angular.forEach(params, function(value, key){
-                    key = camelCase('set-'+key);
-                    
-                    if( !!_self[key] ) {
-                        _self[key](value, arg[1]);
-                    }
-                });
-                
-                return _self;
+        function _private(target) {
+            if( map[target] === void 0 ) {
+                map[target] = new Object();
             }
-            
-            // getter loop
-            angular.forEach(properties, function(prop, index){
-                var methodName = camelCase('get-'+prop);
-                _self[methodName] = function(param) {
-                    if( prop === 'onLoadMethodName' ) {
-                        return _onLoadMethodName;
-                    }
-                    else if( prop === 'languageCode' ) {
-                        return _languageCode;
-                    }
-                    else {
-                        return _parameters[prop];
-                    }
-                };
-            });
+            return map[target];
         }
         
-        return new $grecaptcha;
+        
+        /**
+         * @private
+         * @description
+         * Delete 'target' from private map object.
+         */
+        function delete_private(target) {
+            if( map[target] !== void 0 ) {
+                delete map[target];
+            }
+        }
+        
+        /**
+         * @ngdoc object
+         * 
+         * @name wo.grecaptcha.$grecaptcha:gre
+         * 
+         * 
+         * @description
+         * Grecaptcha instance that contains parameters and element, wigetId.
+         * Returned by $grecaptcha service.
+         */
+        function gre(param){
+            var config = angular.copy(_parameters);
+            
+            //validating param
+            self.set(param || {}, config);
+            
+            //setting _config
+            _private(this)._config = config;
+        }
+        
+        
+        var greMinErr = minErr('gre');
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#reset
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Reset the gre's recaptcha box.
+         * 
+         * @example
+         * <pre>
+         * var el = $document[0].createElement('div');
+         * 
+         * 
+         * var promise = gre.render(el);
+         * 
+         * // later
+         * promise.then(function(){
+         *      gre.reset();
+         * }
+         * </pre>
+         * 
+         * @returns {Object} self
+         */
+        gre.prototype.reset = function(){
+            _grecaptcha.reset(_private(this)._widgetId);
+        
+            return this;
+        };
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#getResponse
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Get the gre's response from recaptcha box if exists.
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * 
+         * // after validating phase
+         * gre.getResponse(); // will give response of recaptcha box
+         * </pre>
+         * 
+         * @returns {string} response
+         */
+        gre.prototype.getResponse = function() {
+            return _grecaptcha.getResponse(_private(this)._widgetId);
+        };
+        
+        
+        
+        /**
+         * @ngdoc function
+         * @name wo.grecaptcha.$grecaptcha:gre#getElement
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Get the element where recaptcha box is rendered if exists.
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * 
+         * var el = $document[0].createElement('div');
+         * 
+         * 
+         * gre.render(el).then(function(){
+         *      gre.getElement(); // jQuery object wrapping 'el'
+         * };
+         * </pre>
+         * 
+         * @returns {object} jQuery object wrapping element where recaptcha box is rendered
+         */
+        gre.prototype.getElement = function() {
+            return _private(this)._element;
+        }
+        
+        
+        
+        /**
+         * @ngdoc function
+         * @name wo.grecaptcha.$grecaptcha:gre#getWidgetId
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Get the recaptcha box's widget id if exists.
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * var el = $document[0].createElement('div');
+         * 
+         * gre.render(el).then(function(){
+         *      gre.getWidgetId(); // 0
+         * });
+         * </pre>
+         * 
+         * @returns {number} widget id
+         */
+        gre.prototype.getWidgetId = function() {
+            return _private(this)._widgetId;
+        }
+        
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @method
+         * @name wo.grecaptcha.$grecaptcha:gre#init
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Set private grecaptcha object from $window after recaptcha script loaded if undefined.
+         * <br><br>
+         * By returning a promise which be resolved on script loaded,<br> 
+         * can check whether grecaptcha initialization is over or not.
+         * 
+         * @param {Function=} onInit a callback performed after initialization is finished
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * 
+         * gre.init(function(){
+         *      console.log('Initializing!!');
+         * }).then(function(){
+         *      console.log('Init is over.');
+         * });
+         * 
+         * </pre>
+         * 
+         * @returns {Promise} Promise that will be resolved when onload callback be execute.
+         * <br> It will be rejected if times out.
+         */
+        gre.prototype.init = function(onInit){
+            var that = this;
+            
+            if( !!_grecaptcha ) {
+                init_promise = $q.when(that);    
+            }
+            
+            
+            if( !!init_promise ) {
+                return init_promise;
+            }
+            
+            
+            return init_promise = $q(function(resolve, reject) {
+                $timeout(function(){
+                    reject(new greMinErr('srcdelay', 
+                        'A recaptcha script load is timed out.'));
+                }, _scriptLoadTimeout);
+                
+                
+                $window[_onLoadMethodName] = function(){
+                    $rootScope.$apply(function(){
+                        (onInit || angular.noop)();
+                        self.setGrecaptcha($window.grecaptcha);
+                        resolve(that);
+                    });
+                };
+                
+                createScript($document);
+            });
+        };
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#remove
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * var el = $document[0].createElement('div');
+         * 
+         * gre.render(el).then(function(){
+         *      el.remove();
+         * });
+         * </pre>
+         * 
+         * @description
+         * Delete the gre instance from private map object and greList.
+         */ 
+        gre.prototype.remove = function(){
+            var widgetId = _private(this)._widgetId;
+            
+            if( widgetId !== void 0 ) {
+                delete greList[widgetId];
+            }
+            
+            delete_private(this);
+        }
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#render
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Render a recaptcha box at 'element'.
+         * 
+         * @example
+         * <pre>
+         * var gre = $grecaptcha();
+         * var el = $document[0].createElement('div');
+         * 
+         * var promise = gre.render(el, function() { console.log('It\'s destroyed.'); });
+         * 
+         * promise.then(function(){
+         *      console.log(res.getWidgetid()); // 0
+         * });
+         * </pre>
+         * 
+         * @param {(DOMElement|string)} element the element string or Object
+         * @param {Function=} onDestory a callback to be executed when element be destroyed
+         * @param {Function=} onInit a callback to be executed when init method is being done
+         * @returns {Promise} Promise that will be resolved when _grecaptcha.render is reached.
+         * <br> The value promise reolve is the widget id of renedered recaptcha box.
+         */
+        gre.prototype.render = function(el, onDestroy, onInit){
+            var that = this, internal = _private(this);
+            
+            if( !angular.isElement(el) ) {
+                throw new greMinErr('badel', 'The element is invalid.');
+            }
+            if( internal._config['sitekey'] == void 0 ) {
+                throw new greMinErr('nositekey', 'The sitekey has to be provided.');
+            }
+            
+            if( internal._widgetId !== void 0 ) {
+                return $q.when(this);
+            }
+            
+            return this.init(onInit).then(function(){
+                var config = {};
+                var cb = internal._config['callback'];
+                var exp_cb = internal._config['expired-callback'];
+                
+                
+                function wrap(param) {
+                    var ret = undefined;
+                    
+                    if( angular.isFunction(param) ) {
+                        var fn = param;
+                        ret =  function(value){
+                            fn.call(this, value);
+                        };
+                    }
+                    
+                    else if( angular.isArray(param) ) {
+                        var arr = param;
+                        
+                        ret = function(value) {
+                            var promise = $q.when(value);
+                            
+                            for(var i = 0 ; i < arr.length ; i++) {
+                                promise = promise.then(arr[i]);
+                            }
+                            
+                            promise.catch(function(reason){
+                                throw new Error(reason);
+                            });
+                        }
+                    }
+                    
+                    return ret;
+                }
+                
+                config = angular.extend({}, internal._config, 
+                    {callback: wrap(cb), 'expired-callback': wrap(exp_cb)});
+                
+                internal._widgetId = _grecaptcha.render(el, config);
+                internal._element = angular.element(el);
+                
+                
+                internal._element.on('$destroy', function(){
+                    that.remove();
+                    (onDestroy || angular.noop)();
+                });
+                
+                return greList[internal._widgetId] = that;
+            });
+        };
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#set
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Set 'params' to gre config. <br>
+         * If first argument is object, this method is executed.
+         * 
+         * This is same with {@link wo.grecaptcha.$grecaptchaProvider $grecaptchaProvider}'s set method.
+         * 
+         * @param {Object} params New parameters
+         * @param {boolean=} includeOthers the flag whether include other properties or not
+         * 
+         * @returns {Object} self
+         */
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#set
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Set 'key' of gre config with 'value'. <br>
+         * If first argument is string, this method is executed.
+         * 
+         * This is same with {@link wo.grecaptcha.$grecaptchaProvider $grecaptchaProvider}'s set method.
+         * 
+         * @param {string} key A key of gre config
+         * @param {*} value A value of the key
+         * 
+         * @returns {Object} self
+         */
+        gre.prototype.set = function() {
+            var args = arguments, that = this;
+            
+            if( angular.isObject(args[0]) ) {
+                var param = args[0], includeOthers = args[1];
+                
+                angular.forEach(param, function(value, key) {
+                    if( !!includeOthers ) {
+                        try {
+                            that.set(key, value);
+                        } catch(e) {}
+                    }
+                    else {
+                        that.set(key, value);
+                    }
+                });
+            }
+            
+            else if( angular.isString(args[0]) ) {
+                var key = args[0], value = args[1];
+                
+                if( config_properties.indexOf(key) !== -1 ) {
+                    var methodName = camelCase('set-'+key);
+                    
+                    self[methodName](value, _private(that)._config);
+                }
+            }
+            
+            else {
+                throw new greMinErr('badsetargs', 
+                'The first argument of set method has to be either object or string.');
+            }
+            
+            return this;
+        };
+         
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @function
+         * @name wo.grecaptcha.$grecaptcha:gre#get
+         * @methodOf wo.grecaptcha.$grecaptcha:gre
+         * 
+         * @description
+         * Get the value of gre config's 'key' property
+         * 
+         * @param {string} key the key of parameters to get
+         * 
+         * @example 
+         * <pre>
+         * var gre = $grecaptcha({theme: 'dark'});
+         * 
+         * gre.get('theme'); // 'dark'
+         * 
+         * gre.get('type'); // 'image' ('image' is defualt type.)
+         * </pre>
+         * 
+         * @returns {*} a value of the key
+         */ 
+        gre.prototype.get = function(key) {
+            if( config_properties.indexOf(key) !== -1 ) {
+                 return _private(this)._config[key];
+            }
+            
+            return void 0;
+        };
+        
+        
+        
+        /**
+         * @ngdoc object
+         * 
+         * @name wo.grecaptcha.$grecaptcha
+         * 
+         * @description
+         * Returns existing gre instance or creates new gre instance with 'param' according to 'param' type.
+         * 
+         * @param {Object|number=} param If object or undefined, creates new gre instance.
+         * 
+         * If number, returns the gre instance which have 'param' widget id if exists.
+         * 
+         * Else throws an error.
+         * 
+         * @requires ng.$q
+         * @requires ng.$window
+         * @requires ng.$document
+         * @requires ng.$rootScope
+         * @requires ng.$timeout
+         * 
+         * @example
+         * <pre>
+         * //returns new gre instance
+         * $grecaptcha({sitekey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', theme: 'light', type: 'audio'}); 
+         * 
+         * // returns gre instance with 0 widget id
+         * $grecaptcha(0); 
+         * </pre>
+         * 
+         * @returns {Object} {@link wo.grecaptcha.$grecaptcha:gre gre} instance
+         */
+         
+        function $grecaptcha(param){
+            if( angular.isNumber(param) ) {
+                if( greList[param] === void 0 ) {
+                    throw new $greMinErr('nogre', 'There is no gre which has wiget_id {0}', param);
+                }
+                return greList[param];
+            }
+            
+            else if( angular.isUndefined(param) || angular.isObject(param) ) {
+                return new gre(param);
+            }
+            
+            else {
+                throw new $greMinErr('badconf', 'Grecaptcha configuration must be a number or object.');
+            }
+        }
+        
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @name wo.grecaptcha.$grecaptcha#getLanguage
+         * @methodOf wo.grecaptcha.$grecaptcha
+         * 
+         * @description
+         * Return the current languageCode.
+         * 
+         * @example
+         * <pre>
+         * // in config phase
+         * $grecaptchaProvider.setSitekey('6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI');
+         * 
+         * 
+         * // in run phase
+         * $grecaptcha.getSitekey(); // '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+         * </pre>
+         * 
+         * @returns {string} the languageCode
+         */
+        $grecaptcha.getLanguageCode = function(){
+            return _languageCode;
+        };
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @name wo.grecaptcha.$grecaptcha#getOnLoadMethodName
+         * @methodOf wo.grecaptcha.$grecaptcha
+         * 
+         * @description
+         * Return the current onLoadMethodName.
+         * 
+         * @example
+         * <pre>
+         * // in config phase
+         * $grecaptchaProvider.setOnLoadMethodName('myCustomLoadMethod');
+         * 
+         * // in run phase
+         * $grecaptcha.getOnLoadMethodName(); // 'myCustomLoadMethod'
+         * </pre>
+         * @returns {string} the onLoadMetethodName
+         */
+        $grecaptcha.getOnLoadMethodName = function(){
+            return _onLoadMethodName;
+        };
+        
+        
+        /**
+         * @ngdoc function
+         * 
+         * @name wo.grecaptcha.$grecaptcha#getGrecaptcha
+         * @methodOf wo.grecaptcha.$grecaptcha
+         * 
+         * @description
+         * Return the current grecaptcha object.
+         * 
+         * @example
+         * <pre>
+         * // in config phase
+         * $grecaptchaProvider.setGrecaptcha(window.grecaptcha);
+         * 
+         * // in run phase
+         * $grecaptcha.getGrecaptcha(); // window.grecaptcha
+         * </pre>
+         * 
+         * @returns {Object} grecaptcha object
+         */
+        $grecaptcha.getGrecaptcha = function() {
+            return _grecaptcha;
+        }
+        
+        
+        return $grecaptcha;
     }]
 }
-$grecaptchaProvider.$inject = ["greLanguageCodes"];
+$grecaptchaProvider.$inject = ["$greLanguageCodes"];
 
 
 /***
- * @ngdoc constant
- * @name greLanguageCodes
+ * @ngdoc service
+ * @name wo.grecaptcha.$greLanguageCodes
  * @description available language codes
+ * <div class="devsite-article-body clearfix" itemprop="articleBody">
+    
+
+    <div class="devsite-table-wrapper"><table style="border: none;">
+      <tbody>
+        <tr>
+          <td style="border: none;">
+            <div class="devsite-table-wrapper"><table>
+              <tbody>
+                <tr align="left">
+                  <th>Language</th>
+                  <th>Value</th>
+                </tr>
+                <tr>
+                  <td>Arabic</td>
+                  <td>ar</td>
+                </tr>
+                <tr>
+                  <td>Afrikaans</td>
+                  <td>af</td>
+                </tr>
+                <tr>
+                  <td>Amharic</td>
+                  <td>am</td>
+                </tr>
+                <tr>
+                  <td>Armenian</td>
+                  <td>hy</td>
+                </tr>
+                <tr>
+                  <td>Azerbaijani</td>
+                  <td>az</td>
+                </tr>
+                <tr>
+                  <td>Basque</td>
+                  <td>eu</td>
+                </tr>
+                <tr>
+                  <td>Bengali</td>
+                  <td>bn</td>
+                </tr>
+                <tr>
+                  <td>Bulgarian</td>
+                  <td>bg</td>
+                </tr>
+                <tr>
+                  <td>Catalan</td>
+                  <td>ca</td>
+                </tr>
+                <tr>
+                  <td>Chinese (Hong Kong)</td>
+                  <td>zh-HK</td>
+                </tr>
+                <tr>
+                  <td>Chinese (Simplified)</td>
+                  <td>zh-CN</td>
+                </tr>
+                <tr>
+                  <td>Chinese (Traditional)</td>
+                  <td>zh-TW</td>
+                </tr>
+                <tr>
+                  <td>Croatian</td>
+                  <td>hr</td>
+                </tr>
+                <tr>
+                  <td>Czech</td>
+                  <td>cs</td>
+                </tr>
+                <tr>
+                  <td>Danish</td>
+                  <td>da</td>
+                </tr>
+                <tr>
+                  <td>Dutch</td>
+                  <td>nl</td>
+                </tr>
+                <tr>
+                  <td>English (UK)</td>
+                  <td>en-GB</td>
+                </tr>
+                <tr>
+                  <td>English (US)</td>
+                  <td>en</td>
+                </tr>
+                <tr>
+                  <td>Estonian</td>
+                  <td>et</td>
+                </tr>
+                <tr>
+                  <td>Filipino</td>
+                  <td>fil</td>
+                </tr>
+                <tr>
+                  <td>Finnish</td>
+                  <td>fi</td>
+                </tr>
+                <tr>
+                  <td>French</td>
+                  <td>fr</td>
+                </tr>
+                <tr>
+                  <td>French (Canadian)</td>
+                  <td>fr-CA</td>
+                </tr>
+                <tr>
+                  <td>Galician</td>
+                  <td>gl</td>
+                </tr>
+              </tbody>
+            </table></div>
+          </td>
+          <td style="border: none;">
+            <div class="devsite-table-wrapper"><table>
+              <tbody>
+                <tr align="left">
+                  <th>Language</th>
+                  <th>Value</th>
+                </tr>
+                <tr>
+                  <td>Georgian</td>
+                  <td>ka</td>
+                </tr>
+                <tr>
+                  <td>German</td>
+                  <td>de</td>
+                </tr>
+                <tr>
+                  <td>German (Austria)</td>
+                  <td>de-AT</td>
+                </tr>
+                <tr>
+                  <td>German (Switzerland)</td>
+                  <td>de-CH</td>
+                </tr>
+                <tr>
+                  <td>Greek</td>
+                  <td>el</td>
+                </tr>
+                <tr>
+                  <td>Gujarati</td>
+                  <td>gu</td>
+                </tr>
+                <tr>
+                  <td>Hebrew</td>
+                  <td>iw</td>
+                </tr>
+                <tr>
+                  <td>Hindi</td>
+                  <td>hi</td>
+                </tr>
+                <tr>
+                  <td>Hungarain</td>
+                  <td>hu</td>
+                </tr>
+                <tr>
+                  <td>Icelandic</td>
+                  <td>is</td>
+                </tr>
+                <tr>
+                  <td>Indonesian</td>
+                  <td>id</td>
+                </tr>
+                <tr>
+                  <td>Italian</td>
+                  <td>it</td>
+                </tr>
+                <tr>
+                  <td>Japanese</td>
+                  <td>ja</td>
+                </tr>
+                <tr>
+                  <td>Kannada</td>
+                  <td>kn</td>
+                </tr>
+                <tr>
+                  <td>Korean</td>
+                  <td>ko</td>
+                </tr>
+                <tr>
+                  <td>Laothian</td>
+                  <td>lo</td>
+                </tr>
+                <tr>
+                  <td>Latvian</td>
+                  <td>lv</td>
+                </tr>
+                <tr>
+                  <td>Lithuanian</td>
+                  <td>lt</td>
+                </tr>
+                <tr>
+                  <td>Malay</td>
+                  <td>ms</td>
+                </tr>
+                <tr>
+                  <td>Malayalam</td>
+                  <td>ml</td>
+                </tr>
+                <tr>
+                  <td>Marathi</td>
+                  <td>mr</td>
+                </tr>
+                <tr>
+                  <td>Mongolian</td>
+                  <td>mn</td>
+                </tr>
+                <tr>
+                  <td>Norwegian</td>
+                  <td>no</td>
+                </tr>
+                <tr>
+                  <td>Persian</td>
+                  <td>fa</td>
+                </tr>
+              </tbody>
+            </table></div>
+          </td>
+          <td style="border: none; vertical-align: top">
+            <div class="devsite-table-wrapper"><table>
+              <tbody>
+                <tr align="left">
+                  <th>Language</th>
+                  <th>Value</th>
+                </tr>
+                <tr>
+                  <td>Polish</td>
+                  <td>pl</td>
+                </tr>
+
+                <tr>
+                  <td>Portuguese</td>
+                  <td>pt</td>
+                </tr>
+                <tr>
+                  <td>Portuguese (Brazil)</td>
+                  <td>pt-BR</td>
+                </tr>
+                <tr>
+                  <td>Portuguese (Portugal)</td>
+                  <td>pt-PT</td>
+                </tr>
+                <tr>
+                  <td>Romanian</td>
+                  <td>ro</td>
+                </tr>
+                <tr>
+                  <td>Russian</td>
+                  <td>ru</td>
+                </tr>
+                <tr>
+                  <td>Serbian</td>
+                  <td>sr</td>
+                </tr>
+                <tr>
+                  <td>Sinhalese</td>
+                  <td>si</td>
+                </tr>
+                <tr>
+                  <td>Slovak</td>
+                  <td>sk</td>
+                </tr>
+                <tr>
+                  <td>Slovenian</td>
+                  <td>sl</td>
+                </tr>
+                <tr>
+                  <td>Spanish</td>
+                  <td>es</td>
+                </tr>
+                <tr>
+                  <td>Spanish (Latin America)</td>
+                  <td>es-419</td>
+                </tr>
+                <tr>
+                  <td>Swahili</td>
+                  <td>sw</td>
+                </tr>
+                <tr>
+                  <td>Swedish</td>
+                  <td>sv</td>
+                </tr>
+                <tr>
+                  <td>Tamil</td>
+                  <td>ta</td>
+                </tr>
+                <tr>
+                  <td>Telugu</td>
+                  <td>te</td>
+                </tr>
+                <tr>
+                  <td>Thai</td>
+                  <td>th</td>
+                </tr>
+                <tr>
+                  <td>Turkish</td>
+                  <td>tr</td>
+                </tr>
+                <tr>
+                  <td>Ukrainian</td>
+                  <td>uk</td>
+                </tr>
+                <tr>
+                  <td>Urdu</td>
+                  <td>ur</td>
+                </tr>
+                <tr>
+                  <td>Vietnamese</td>
+                  <td>vi</td>
+                </tr>
+                <tr>
+                  <td>Zulu</td>
+                  <td>zu</td>
+                </tr>
+              </tbody>
+            </table></div>
+          </td>
+        </tr>
+      </tbody>
+    </table></div>
+  </div>
+  
+  (from {@link https://developers.google.com/recaptcha/docs/language google recaptcha official site})
  **/
-var greLanguageCodes = {
+var $greLanguageCodes = {
     "ar"        : "Arabic"
 ,   "af"        : "Afrikaans"
 ,   "am"        : "Amharic"
@@ -789,46 +1837,122 @@ var greLanguageCodes = {
 };
 
 
-function grecaptchaDirective($grecaptcha, $parse, $q, $document){
+/**
+ * @ngdoc directive
+ * @name wo.grecaptcha.$grecaptcha:grecaptcha
+ * 
+ * @restrict 'A'
+ * 
+ * @requires wo.grecaptcha.$grecaptcha
+ * @requires ng.$parse
+ * @requires ng.$document
+ * 
+ * @param {string=} gre-info Assignable angular expression to contain information about gre object
+ * @param {string} ng-model Assignable angular expression to data-bind to
+ * 
+ * @scope 
+ * 
+ * @description
+ * Set view value of model when recaptcha validating is done.<br>
+ * Reset view value if recaptcha be expired.
+ * 
+ * Load greInfo with information about gre object.
+ * 
+ * @example
+    <example module="greDemo">
+        <file name="index.html">
+            <div data-ng-controller="GreCtrl">
+                <div grecaptcha='{theme: "dark"}' gre-info="greInfo" data-ng-model="response">
+                    Loading..
+                </div>
+                
+                <div style="word-wrap: break-word"> response : {{response}} </div>
+            </div>
+        </file>
+    
+        <file name="script.js">
+            angular.module('greDemo', ['wo.grecaptcha'])
+            .config(function($grecaptchaProvider) {
+                $grecaptchaProvider.set({
+                    sitekey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI", // test sitekey
+                });
+            })
+            .controller("GreCtrl", function($scope) {
+                $scope.response;
+                $scope.greInfo = {};
+                
+                var greInfoFind = $scope.$on('greInfo', function(event, greInfo) {
+                    if( !!greInfo ) {
+                        console.log(greInfo.widgetId); //widget id of rendered recaptcha box
+                        greInfoFind();
+                    }
+                });
+                
+                $scope.$on('response', function(event, response) {
+                    console.log(response); // response of recaptcha box
+                });
+            });
+        </file>
+    </example>
+ */
+function grecaptchaDirective($grecaptcha, $parse, $document){
+    
     var directiveDefinitionObject = {
         strict: 'A',
         require: '^ngModel',
+        scope: {
+            info: '=greInfo'
+        },
         link: function(scope, el, attr, ngModelCtrl){
+            
+            if( scope.info == void 0 ) scope.info = {};   
+            //This will not cause any side effect. Just for preventing undefined error at below
+            
             var param = $parse(attr['grecaptcha'] || '{}')(scope);
+            var gre = $grecaptcha(param);
             
-            var cb = angular.copy($grecaptcha.getCallback() || angular.noop);
-            var exp_cb = angular.copy($grecaptcha.getExpiredCallback() || angular.noop);
-            
-            // TODO I think that it's not right to append callback here
-            // It has to be in render method.
-            param.callback = (function(res){
-                cb(res);
+            function setViewValue(res) {
                 ngModelCtrl.$setViewValue(res);
+                
+                return res;
+            }
+            
+            gre.set({
+                callback: 
+                    [setViewValue].concat(gre.get('callback')),
+                
+                'expired-callback': 
+                    [ngModelCtrl.$setViewValue].concat(gre.get('expired-callback'))
             });
             
-            param['expired-callback'] = (function(){
-                exp_cb();
-                ngModelCtrl.$setViewValue(undefined);
-            });
-            
-            scope.promise = $grecaptcha.init().then(function(){
+            scope.info.promise = gre.init().then(function(){
                 el.empty();
-                return $grecaptcha.render(el[0], param)
-            });
-            
-            scope.$on('$destroy', function(){
-                angular.element($document[0].querySelector('.pls-container')).parent().remove();
+                
+                return gre.render(el[0], function(){
+                    angular.element($document[0].querySelector('.pls-container')).parent().remove();
+                });
+            }).then(function(){
+                scope.info.widgetId = gre.getWidgetId();
+                
+                return gre;
             });
         }
     };
     
     return directiveDefinitionObject;
 }
-grecaptchaDirective.$inject = ["$grecaptcha", "$parse", "$q", "$document"];
+grecaptchaDirective.$inject = ["$grecaptcha", "$parse", "$document"];
 
 
-var app = angular.module('grecaptcha', [])
-.constant('greLanguageCodes', greLanguageCodes)
+/**
+ * @ngdoc overview
+ * @name wo.grecaptcha
+ * 
+ * @description
+ * A module for grecaptcha
+ */
+var app = angular.module('wo.grecaptcha', [])
+.constant('$greLanguageCodes', $greLanguageCodes)
 .provider('$grecaptcha', $grecaptchaProvider)
 .directive('grecaptcha', grecaptchaDirective);
 

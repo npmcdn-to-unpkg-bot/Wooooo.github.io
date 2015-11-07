@@ -11,7 +11,7 @@ define(function(require){
             
             //angular unofficial libraries
             'ui.router',
-            'grecaptcha',  
+            'wo.grecaptcha',  
             
             
             //custom
