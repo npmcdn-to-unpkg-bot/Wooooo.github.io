@@ -67,7 +67,6 @@ NG_DOCS={
   "scripts": [
     "angular.min.js",
     "angular-animate.min.js",
-    "angular-g-recaptcha.js",
-    "ssl.js"
+    "angular-g-recaptcha.js"
   ]
 };
