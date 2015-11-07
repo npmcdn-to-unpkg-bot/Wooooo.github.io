@@ -1,5 +1,5 @@
 {
-  "name": "angular-g-recaptcha",
+  "name": "angular-g-recaptcha-page",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-ngdocs": "^0.2.9",
     "gulp": "^3.9.0"
   }
 }
