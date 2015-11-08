@@ -10,17 +10,16 @@
         <script src="scripts/ssl.js"></script>
         
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="//cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.css">
+        <link rel="stylesheet" href="//cdn.rawgit.com/twbs/bootstrap/v4-dev/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="styles/style.css">
     </head>
     
     <body>
-        
+        <header data-ng-include="'parts/header.html'"></header>
         <div class="container">
-            <header data-ng-include="'parts/header.html'"></header>
             <div data-ui-view></div>
-            <footer data-ng-include="'parts/footer.html'"></footer>
         </div>
+        <!--<footer class="navbar navbar-inverse navbar-fixed-bottom bg-inverse" data-ng-include="'parts/footer.html'"></footer>-->
         
         
         
