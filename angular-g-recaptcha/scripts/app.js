@@ -16,7 +16,8 @@ define(function(require){
             
             //custom
             require('route').name,
-            require('ctrl').name
+            require('ctrl').name,
+            require('trackAnalytics').name
         ]
     )
     .constant('recaptchaSitekey', '6LepGxATAAAAAAwnyeRvc6JQLuyXzXBBi3G-d1s_')

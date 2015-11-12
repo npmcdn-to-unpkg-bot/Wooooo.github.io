@@ -8,7 +8,8 @@ module.exports = function(grunt) {
             scripts: [
                 '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js',
                 '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular-animate.min.js',
-                './bower_components/angular-g-recaptcha/angular-g-recaptcha.js'
+                './bower_components/angular-g-recaptcha/angular-g-recaptcha.js',
+                
             ],
             html5Mode: false,
             startPage: '/api',
@@ -43,6 +44,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-ngdocs');
 
   // Default task(s).
-  grunt.registerTask('default', ['ngdocs']);
+  grunt.registerTask('remind', function() {
+      grunt.log.ok('You should correct google analytics track code with below code.');
+      grunt.log.ok("$window.ga('send', 'pageview', { page: $location.url() });");
+  })
+  grunt.registerTask('default', ['ngdocs', 'remind']);
 
 };
