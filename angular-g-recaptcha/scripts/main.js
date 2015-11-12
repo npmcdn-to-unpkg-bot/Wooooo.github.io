@@ -9,7 +9,7 @@ requirejs.config({
         //angular unofficial libraries
         'ui-router' :           '//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min',
         
-        'angular-g-recaptcha' : 'angular-g-recaptcha'
+        'angular-g-recaptcha' : '../bower_components/angular-g-recaptcha/angular-g-recaptcha.min'
     },
     
     shim: {

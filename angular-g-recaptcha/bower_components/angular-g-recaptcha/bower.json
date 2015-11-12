@@ -1,0 +1,40 @@
+{
+  "name": "angular-g-recaptcha",
+  "version": "3.1.0",
+  "homepage": "https://github.com/Wooooo/angular-g-recaptcha",
+  "authors": [
+    {
+      "name": "Taewoo Kim",
+      "email": "xodn4195@gmail.com"
+    }
+  ],
+  "description": "Angular module for google recaptcha",
+  "main": "angular-g-recaptcha.js",
+  "keywords": [
+    "recaptcha",
+    "angular",
+    "grecaptcha",
+    "angular-recaptcha",
+    "angular-g-recaptcha",
+    "google",
+    "google-recaptcha"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.4.7"
+  },
+  "license": "MIT",
+  "moduleType": [
+    "globals"
+  ],
+  "devDependencies": {
+    "angular-mocks": "^1.4.7",
+    "angular-animate": "^1.4.7"
+  }
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html data-ng-app="greApp" data-ng-csp>
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="profile webapp">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+        <title>angular-g-recaptcha</title>
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    </head>
+  
+    <body>
+        
+        <div class="well">
+            <h3> grecaptcha custom directive with $grecaptcha service </h3>
+            <div my-grecaptcha></div>
+            <div data-ng-controller="grecaptchaCtrl">
+                response value : <div data-ng-bind="response"></div>
+            </div>
+        </div>
+        
+        <div data-ng-include="'/example/templates/links.html'"></div>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.js"></script>
+        <script src="scripts/angular-g-recaptcha.js"></script>
+        <script src="scripts/sitekey.js"></script>
+        
+        <script>
+            var app = angular.module('greApp', ['grecaptcha'])
+            .config(function($grecaptchaProvider){
+                $grecaptchaProvider.setParameters({
+                    sitekey: window.sitekey
+                });
+            })
+            .directive('myGrecaptcha', function($grecaptcha, $rootScope){
+                var myGrecaptcha = {
+                    strict: 'A',
+                    link: function(scope, el, attr){
+                        
+                        $grecaptcha
+                        .setCallback(function(res){
+                            $rootScope.$broadcast('recaptcha:response', res);
+                        })
+                        .setExpiredCallback(function(){
+                            console.log('expired!');
+                        })
+                        .render(el[0]);
+                    }
+                }
+                
+                return myGrecaptcha;
+            })
+            .controller('grecaptchaCtrl', function($scope){
+                $scope.$on('recaptcha:response', function(event, res){
+                    $scope.response = res;
+                })
+            });
+        </script>
+      
+  </body>
+</html>
