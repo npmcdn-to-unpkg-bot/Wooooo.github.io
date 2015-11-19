@@ -45,6 +45,11 @@
         
         <script>
             var app = angular.module('segApp', ['wo.7segments'])
+            .run(function($rootScope, $location, $window) {
+                $rootScope.$on('$locationChangeSuccess', function() {
+                    $window.ga('send', 'pageview', { page: $location.url() });
+                });
+            })
             .controller('indexCtrl', function($scope, $interval){
                 $interval(function(){
                     var a = new Date();
