@@ -1,0 +1,34 @@
+{
+  "name": "angular-7segments",
+  "version": "0.0.1",
+  "description": "Angular plugin for displaying 7segments",
+  "main": "angular-7segments.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.4.8"
+  },
+  "license": "MIT",
+  "moduleType": [
+    "globals"
+  ],
+  "devDependencies": {
+    "angular-mocks": "^1.4.8"
+  },
+  "homepage": "https://github.com/Wooooo/angular-7segments",
+  "_release": "0.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.1",
+    "commit": "37953b4ae2d54ab4483561483cca58630f0c5246"
+  },
+  "_source": "git://github.com/Wooooo/angular-7segments.git",
+  "_target": "~0.0.1",
+  "_originalSource": "angular-7segments",
+  "_direct": true
+}

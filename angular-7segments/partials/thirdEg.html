@@ -1,0 +1,32 @@
+<div seg-group data-ng-model="value" seg-options="options"></div>
+
+<div class="input-group">
+    <span class="input-group-addon"> value </span>
+    <input type="text" class="form-control" data-ng-model="value" data-ng-trim="false"/>
+</div>
+
+<div class="input-group">
+    <span class="input-group-addon"> size </span>
+    <input type="number" class="form-control" data-ng-model="options.size">
+</div>
+
+<div class="input-group">
+    <span class="input-group-addon"> align </span>
+    <div class="form-control">
+        <div class="radio-inline">
+            <label>
+                <input type="radio" data-ng-model="options.align" data-ng-value="'right'" checked> right
+            </label>
+        </div>
+        
+        <div class="radio-inline">
+            <label>
+                <input type="radio" data-ng-model="options.align" data-ng-value="'left'"> left
+            </label>
+        </div>
+    </div>
+</div>
+
+<div>
+    <span>{{options}}</span>
+</div>
