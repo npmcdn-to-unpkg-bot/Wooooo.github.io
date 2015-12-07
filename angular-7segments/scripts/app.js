@@ -32,7 +32,6 @@ var app = angular.module('segment', ['wo.7segments', 'hljs'])
 .run(function($rootScope, $location, $window) {
     $rootScope.$on('$locationChangeSuccess', function(event, newState) {
         console.log($location.path());
-        console.log(newState);
-        $window.ga('send', 'pageview', { page: newState });
+        $window.ga('send', 'pageview', { page: $location.path() });
     });
 });
