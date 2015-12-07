@@ -14,7 +14,7 @@ var app = angular.module('segment', ['wo.7segments', 'hljs'])
             scope.cardBlock = 'partials/'+scope.cardName+'Eg.html';
             scope.cardFooter = 'partials/'+scope.cardName+'EgDes.html';
         }
-    }
+    };
     
     return directiveDefinitionObject;
 })
@@ -29,3 +29,8 @@ var app = angular.module('segment', ['wo.7segments', 'hljs'])
     $scope.value = '-_.123SEG';
     $scope.options = {size: 12, watch:true, align: 'right'};
 })
+.run(function($rootScope, $location, $window) {
+    $rootScope.$on('$locationChangeSuccess', function() {
+        $window.ga('send', 'pageview', { page: $location.url() });
+    });
+});

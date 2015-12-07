@@ -3,7 +3,7 @@ define(function(require) {
     
     var app = angular.module('analytics', [])
     .run(function($rootScope, $location, $window) {
-        $rootScope.$on('$routeChangeSuccess', function() {
+        $rootScope.$on('$locationChangeSuccess', function() {
             $window.ga('send', 'pageview', { page: $location.url() });
         });
     });
