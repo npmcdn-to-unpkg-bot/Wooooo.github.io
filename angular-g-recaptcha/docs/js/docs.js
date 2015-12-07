@@ -272,7 +272,7 @@ docsApp.controller.DocsController = function($scope, $location, $window, section
   $scope.afterPartialLoaded = function() {
     var currentPageId = $location.path();
     $scope.partialTitle = $scope.currentPage.shortName;
-    $window.ga('send', 'pageview', { page: $location.url() });
+    $window.ga('send', 'pageview', { page: $location.path() });
     //$window._gaq && $window._gaq.push(['_trackPageview', currentPageId]);
     loadDisqus(currentPageId);
   };
