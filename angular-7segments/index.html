@@ -15,9 +15,16 @@
   
     <body>
         <div class="bg-corn padding-1 text-white container">
-            <h1 class="display-3">
+            <h1 class="display-3" data-ng-init="title = '7SEG';">
+                
+                    
+                    
                 <div>angular</div>
-                <div>7segments</div> 
+                <span seg-group data-ng-model="title" 
+                    seg-options="{width:50, height: 100}"
+                    seg-digit-options="{onClass:'title-segment-on',
+                    digitClass: 'title-segment-digit'}"></span>ments
+                
                 <small class="text-muted" style="display:block;">
                     example
                 </small>
@@ -39,7 +46,8 @@
             <div card card-title="Options example" card-name="third"
                 card-ctrl="thirdEgCtrl"></div>
             
-            
+            <div card card-title="Custom style" card-name="fourth"
+                card-ctrl="fourthEgCtrl"></div>
             <br><br>
         </div>
         
@@ -47,22 +55,11 @@
             <a href="https://github.com/wooooo/angular-7segments" class="text-white"> github </a>
         </footer>
         
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-            
-            ga('create', 'UA-69569159-3', 'auto');
-            //ga('send', 'pageview');
-        
-        </script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js"></script>
-        <script src="bower_components/angular-7segments/angular-7segments.js"></script>
+        <script src="scripts/angular-7segments.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
         <!--<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/languages/xml.min.js"></script>-->
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular-highlightjs/0.5.1/angular-highlightjs.min.js"></script>
         <script src="scripts/app.js"></script>
-        
     </body>
 </html>
