@@ -20,10 +20,9 @@
                     
                     
                 <div>angular</div>
-                <span seg-group data-ng-model="title" 
-                    seg-options="{width:50, height: 100}"
+                <span seg-group data-ng-model="title"
                     seg-digit-options="{onClass:'title-segment-on',
-                    digitClass: 'title-segment-digit'}"></span>ments
+                    digitClass: 'title-segment-digit', width:50, height: 100}"></span>ments
                 
                 <small class="text-muted" style="display:block;">
                     example
@@ -34,9 +33,14 @@
         
         <div class="main-wrapper container bg-white">
             <br><br>
+            
             <div card card-title="Basic Example" card-name="first" card-ctrl="firstEgCtrl"></div>
             
             <br>
+            
+            <div card card-title="Time Example" card-name="time" card-ctrl="timeEgCtrl"></div>
+            
+            <br> 
             
             <div card card-title="Dots example" card-name="second" 
                 card-ctrl="secondEgCtrl"></div>
@@ -46,8 +50,21 @@
             <div card card-title="Options example" card-name="third"
                 card-ctrl="thirdEgCtrl"></div>
             
+            <br>
+            
             <div card card-title="Custom style" card-name="fourth"
                 card-ctrl="fourthEgCtrl"></div>
+            
+            <br>
+            
+            <div card card-title="Custom pattern" card-name="fifth"
+                card-ctrl="fifthEgCtrl"></div>
+            
+            <br>
+            
+            <div card card-title="Custom shape" card-name="sixth"
+                card-ctrl="sixthEgCtrl"></div>
+                
             <br><br>
         </div>
         
@@ -55,7 +72,7 @@
             <a href="https://github.com/wooooo/angular-7segments" class="text-white"> github </a>
         </footer>
         
-        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.0-rc.0/angular.min.js"></script>
         <script src="scripts/angular-7segments.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/highlight.min.js"></script>
         <!--<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/languages/xml.min.js"></script>-->
